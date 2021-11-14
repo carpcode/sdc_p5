@@ -35,6 +35,8 @@ FusionEKF::FusionEKF() {
   /**
    * TODO: Finish initializing the FusionEKF.
    * TODO: Set the process and measurement noises
+   * set f and q
+   * call
    */
 
 
