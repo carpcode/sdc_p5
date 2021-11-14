@@ -35,9 +35,15 @@ FusionEKF::FusionEKF() {
   /**
    * TODO: Finish initializing the FusionEKF.
    * TODO: Set the process and measurement noises
-   * set f and q
-   * call
    */
+  
+  // Intial 
+  ekf_.F_ = MatrixXd(4, 4);
+  ekf_.F_ << 1, 0, 1, 0,
+            0, 1, 0, 1,
+            0, 0, 1, 0,
+            0, 0, 0, 1;
+  ekf_.Q_ = MatrixXd(4,4);
 
 
 }
@@ -63,13 +69,38 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
     ekf_.x_ = VectorXd(4);
     ekf_.x_ << 1, 1, 1, 1;
 
+
     if (measurement_pack.sensor_type_ == MeasurementPackage::RADAR) {
       // TODO: Convert radar from polar to cartesian coordinates 
       //         and initialize state.
+      // TODO: Initialize state.
+      /**
+       * raw_measurements_[0] = rho
+       * raw_measurements_[0] = phi
+       * raw_measurements_[0] = rhodot
+       */
+      
+      float rho = measurement_pack.raw_measurements_[0];
+      float phi = measurement_pack.raw_measurements_[1];
+      float rhodot = measurement_pack.raw_measurements_[2];
+
+      ekf_.x_(0) = rho*cos(phi); //px
+      ekf_.x_(1) = rho*sin(phi); //py
+      ekf_.x_(2) = rhodot*cos(phi); //vx
+      ekf_.x_(3) = rhodot*sin(phi); //vy
 
     }
     else if (measurement_pack.sensor_type_ == MeasurementPackage::LASER) {
       // TODO: Initialize state.
+      /**
+       * raw_measurements_[0] = px
+       * raw_measurements_[1] = py
+       */
+
+      ekf_.x_(0) = measurement_pack.raw_measurements_[0]; //px
+      ekf_.x_(1) = measurement_pack.raw_measurements_[1]; //py
+      ekf_.x_(2) = 0; //vx
+      ekf_.x_(3) = 0; //vy
 
     }
 
