@@ -45,7 +45,6 @@ FusionEKF::FusionEKF() {
             0, 0, 0, 1;
   ekf_.Q_ = MatrixXd(4,4);
 
-
 }
 
 /**
@@ -67,7 +66,7 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
     // first measurement
     cout << "EKF: " << endl;
     ekf_.x_ = VectorXd(4);
-    ekf_.x_ << 1, 1, 1, 1;
+    ekf_.x_ << 1, 1, 1, 1; // keep for fall back reason
 
 
     if (measurement_pack.sensor_type_ == MeasurementPackage::RADAR) {
@@ -86,8 +85,8 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
 
       ekf_.x_(0) = rho*cos(phi); //px
       ekf_.x_(1) = rho*sin(phi); //py
-      ekf_.x_(2) = rhodot*cos(phi); //vx
-      ekf_.x_(3) = rhodot*sin(phi); //vy
+      ekf_.x_(2) = 0; //vx
+      ekf_.x_(3) = 0; //vy
 
     }
     else if (measurement_pack.sensor_type_ == MeasurementPackage::LASER) {
@@ -119,6 +118,14 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
    * TODO: Update the process noise covariance matrix.
    * Use noise_ax = 9 and noise_ay = 9 for your Q matrix.
    */
+
+  float noise_ax = 9;
+  float noise_ay = 9;
+
+  ekf_.Q_ <<  dt_4/4*noise_ax, 0, dt_3/2*noise_ax, 0,
+         0, dt_4/4*noise_ay, 0, dt_3/2*noise_ay,
+         dt_3/2*noise_ax, 0, dt_2*noise_ax, 0,
+         0, dt_3/2*noise_ay, 0, dt_2*noise_ay;
 
   ekf_.Predict();
 
