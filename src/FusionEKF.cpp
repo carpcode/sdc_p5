@@ -84,12 +84,12 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
       
       float rho = measurement_pack.raw_measurements_[0];
       float phi = measurement_pack.raw_measurements_[1];
-      float rhodot = measurement_pack.raw_measurements_[2];
+      // float rhodot = measurement_pack.raw_measurements_[2]; // commented out, since not used ..
 
-      ekf_.x_(0) = rho*cos(phi); //px
-      ekf_.x_(1) = rho*sin(phi); //py
-      ekf_.x_(2) = 0; //vx
-      ekf_.x_(3) = 0; //vy
+      ekf_.x_ << rho*cos(phi),
+                  rho*sin(phi),
+                  0,
+                  0;
 
     }
     else if (measurement_pack.sensor_type_ == MeasurementPackage::LASER) {
@@ -99,11 +99,10 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
        * raw_measurements_[1] = py
        */
 
-      ekf_.x_(0) = measurement_pack.raw_measurements_[0]; //px
-      ekf_.x_(1) = measurement_pack.raw_measurements_[1]; //py
-      ekf_.x_(2) = 0; //vx
-      ekf_.x_(3) = 0; //vy
-
+      ekf_.x_ << measurement_pack.raw_measurements_[0],
+                  measurement_pack.raw_measurements_[1],
+                  0,
+                  0;
     }
 
     // done initializing, no need to predict or update
