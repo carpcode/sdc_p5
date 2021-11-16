@@ -119,6 +119,8 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
    * Prediction
    */
 
+  cout << "dt: " << dt << endl;
+
 
   /**
    * TODO: Update the state transition matrix F according to the new elapsed time.
