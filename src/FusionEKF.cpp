@@ -146,6 +146,8 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
 
   ekf_.Predict();
 
+  cout << "x_pred: " << ekf_.x_ << endl;
+
   /**
    * Update
    */
