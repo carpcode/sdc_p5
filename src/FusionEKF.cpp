@@ -93,8 +93,25 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
       float phi = measurement_pack.raw_measurements_[1];
       // float rhodot = measurement_pack.raw_measurements_[2]; // commented out, since not used ..
 
-      ekf_.x_ << rho*cos(phi),
-                  rho*sin(phi),
+      float px = rho*cos(phi);
+      float py = rho*sin(phi);
+
+      // define lower boundary to avoid deviding by zero
+      float zero_boundary = 0.001;
+
+      if(px < zero_boundary){
+        px = zero_boundary;
+      }
+
+      if(py < zero_boundary){
+        py = zero_boundary;
+      }
+
+      // I would expect vx = rho_dot * cos(phi) but the project text says that 
+      // rho_dot can not be ued to initialize the state, therefore I ommit it.
+
+      ekf_.x_ << px,
+                  py,
                   0,
                   0;
 
