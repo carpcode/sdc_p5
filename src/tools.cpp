@@ -70,8 +70,8 @@ MatrixXd Tools::CalculateJacobian(const VectorXd& x_state) {
   
 
   // check division by zero
-  const float eps = 0.001;
-  c1 = std::max(eps, px*px + py*py);
+  const float eps = 0.01;
+  c1 = std::max(eps, c1);
   
   // compute the Jacobian matrix
   
