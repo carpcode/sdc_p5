@@ -44,7 +44,7 @@ class KalmanFilter {
    * Common Update function
    * 
    */
-  void UpdateCommon(const VectorXd& y);
+  void UpdateCommon(const Eigen::VectorXd& y);
 
   /**
    * Updates the state by using standard Kalman Filter equations
