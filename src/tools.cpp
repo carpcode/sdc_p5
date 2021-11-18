@@ -78,7 +78,7 @@ MatrixXd Tools::CalculateJacobian(const VectorXd& x_state) {
   const float eps = 0.001;
   c1 = std::max(eps, c1);
   
-  // compute the Jacobian matrix
+  // compute the Jacobian matrix-elements
   
   Hj(0,0) = px/c2;
   Hj(0,1) = py/c2;
