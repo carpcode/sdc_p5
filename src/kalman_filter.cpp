@@ -22,10 +22,23 @@ void KalmanFilter::Init(VectorXd &x_in, MatrixXd &P_in, MatrixXd &F_in,
   Q_ = Q_in;
 }
 
+void KalmanFilter::NormalizeAngle(double& phi){
+  phi = atan2(sin(phi), cos(phi));
+}
+
 void KalmanFilter::Predict() {
   x_ = F_ * x_;
   MatrixXd Ft = F_.transpose();
   P_ = F_ * P_ * Ft + Q_;
+}
+
+void KalmanFilter::UpdateCommon(const VectorXd& y){
+  const MatrixXd PHt = P_ * H_.transpose();
+  const MatrixXd S = H_ * PHt + R_;
+  const MatrixXd K = PHt * S.inverse();
+
+  x_ += K * y;
+  P_ -= K * H_ * P_;
 }
 
 void KalmanFilter::Update(const VectorXd &z) {
@@ -34,17 +47,7 @@ void KalmanFilter::Update(const VectorXd &z) {
   
   VectorXd z_pred = H_ * x_;
   VectorXd y = z - z_pred;
-  MatrixXd Ht = H_.transpose();
-  MatrixXd S = H_ * P_ * Ht + R_;
-  MatrixXd Si = S.inverse();
-  MatrixXd PHt = P_ * Ht;
-  MatrixXd K = PHt * Si;
-
-  //new estimate
-  x_ = x_ + (K * y);
-  long x_size = x_.size();
-  MatrixXd I = MatrixXd::Identity(x_size, x_size);
-  P_ = (I - K * H_) * P_;
+  UpdateCommon(y);
 }
 
 void KalmanFilter::UpdateEKF(const VectorXd &z) {
@@ -55,29 +58,11 @@ void KalmanFilter::UpdateEKF(const VectorXd &z) {
   float rho_pred = sqrt(x_(0)*x_(0) + x_(1)*x_(1));
   float phi_pred = atan2(x_(1),x_(0));
   float rho_dot_pred = (x_(0)*x_(2)+x_(1)*x_(3))/rho_pred;
-
-  // ensure that phi_pred is in range -pi .. pi
-  while (phi_pred > M_PI || phi_pred < -M_PI)
-  {
-    if(phi_pred > M_PI){
-      phi_pred -= M_PI;
-    } else {
-      phi_pred += M_PI;
-    }
-  }
   
   z_pred << rho_pred, phi_pred, rho_dot_pred;
 
   VectorXd y = z - z_pred;
-  MatrixXd Ht = H_.transpose();
-  MatrixXd S = H_ * P_ * Ht + R_;
-  MatrixXd Si = S.inverse();
-  MatrixXd PHt = P_ * Ht;
-  MatrixXd K = PHt * Si;
-
-  //new estimate
-  x_ = x_ + (K * y);
-  long x_size = x_.size();
-  MatrixXd I = MatrixXd::Identity(x_size, x_size);
-  P_ = (I - K * H_) * P_;
+  // ensure that innovation vector y(1) is between -pi..pi
+  NormalizeAngle(y(1));
+  UpdateCommon(y);
 }

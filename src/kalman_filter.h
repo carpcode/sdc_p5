@@ -35,6 +35,18 @@ class KalmanFilter {
   void Predict();
 
   /**
+   * Ensure that the the predicted angle is between -pi and pi
+   * 
+   */
+  void NormalizeAngle(double& phi);
+
+  /**
+   * Common Update function
+   * 
+   */
+  void UpdateCommon(const VectorXd& y);
+
+  /**
    * Updates the state by using standard Kalman Filter equations
    * @param z The measurement at k+1
    */

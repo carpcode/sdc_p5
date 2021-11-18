@@ -49,10 +49,7 @@ FusionEKF::FusionEKF() {
   
   // Initial 
   ekf_.F_ = MatrixXd(4, 4);
-  ekf_.F_ << 1, 0, 1, 0,
-            0, 1, 0, 1,
-            0, 0, 1, 0,
-            0, 0, 0, 1;
+  ekf_.F_ = MatrixXd::Identity(4,4);
   ekf_.Q_ = MatrixXd(4,4);
 
 }
@@ -99,11 +96,11 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
       // define lower boundary to avoid deviding by zero
       float zero_boundary = 0.001;
 
-      if(px < zero_boundary){
+      if(abs(px) < zero_boundary){
         px = zero_boundary;
       }
 
-      if(py < zero_boundary){
+      if(abs(py) < zero_boundary){
         py = zero_boundary;
       }
 
@@ -157,12 +154,12 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
   ekf_.F_(0, 2) = dt;
   ekf_.F_(1, 3) = dt;
 
-  float noise_ax = 9;
-  float noise_ay = 9;
+  const float noise_ax = 9;
+  const float noise_ay = 9;
 
-  float dt_2 = dt * dt;
-  float dt_3 = dt_2 * dt;
-  float dt_4 = dt_3 * dt;
+  const float dt_2 = dt * dt;
+  const float dt_3 = dt_2 * dt;
+  const float dt_4 = dt_3 * dt;
 
   ekf_.Q_ <<  dt_4/4*noise_ax, 0, dt_3/2*noise_ax, 0,
          0, dt_4/4*noise_ay, 0, dt_3/2*noise_ay,
